@@ -7,6 +7,9 @@ using BackendService.Data;
 
 namespace BackendService.Contexts
 {
+    /// <summary>
+    /// Context to the database for code first approach
+    /// </summary>
     public class ApplicationContext : DbContext
     {
         public ApplicationContext() { }

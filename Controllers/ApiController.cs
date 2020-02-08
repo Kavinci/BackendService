@@ -14,6 +14,10 @@ namespace BackendService.Controllers
     {
         private readonly ILogger<ApiController> _logger;
 
+        /// <summary>
+        /// Controller for the API endpoints with some logging
+        /// </summary>
+        /// <param name="logger"></param>
         public ApiController(ILogger<ApiController> logger)
         {
             _logger = logger;
