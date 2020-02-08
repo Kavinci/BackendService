@@ -1,10 +1,11 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackendService.Data
 {
     public class Request
     {
-        public Guid Id { get; set; }
+        public Guid RequestId { get; set; }
         public DateTime Initiated { get; set; }
         public DateTime Completed { get; set; }
         public StatusType Status { get; set; }

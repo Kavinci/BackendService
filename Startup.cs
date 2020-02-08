@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using BackendService.Contexts;
 
 namespace BackendService
 {
@@ -26,6 +28,8 @@ namespace BackendService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddDbContext<ApplicationContext>(options =>
+                options.UseSqlite(Configuration.GetConnectionString("Application")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
