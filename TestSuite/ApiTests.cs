@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using BackendService.Controllers;
 
 namespace TestSuite
 {
@@ -11,10 +12,11 @@ namespace TestSuite
         [SetUp]
         public void Setup()
         {
+
         }
 
         [Test]
-        public void Test1()
+        public void IsAppRunning()
         {
             Assert.Pass();
         }

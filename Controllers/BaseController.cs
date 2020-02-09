@@ -15,7 +15,7 @@ namespace BackendService.Controllers
     [ApiController]
     public class BaseController : ControllerBase
     {
-        private readonly ApplicationContext _db;
+        public ApplicationContext _db;
         private readonly ILogger<ApiController> _logger;
 
         /// <summary>
@@ -27,6 +27,26 @@ namespace BackendService.Controllers
         {
             _db = context;
             _logger = logger;
+        }
+
+        public ActionResult Respond(int status, string? message, object? obj)
+        {
+            var log = "StatusCode: " + status + "\nMessage: " + message + "\nResponseObj: " + obj.ToString();
+            switch (status)
+            {
+                case StatusCodes.Status200OK:
+                    _logger.LogInformation(log);
+                    return Ok(message ?? obj);
+                case StatusCodes.Status204NoContent:
+                    _logger.LogInformation(log);
+                    return NoContent();
+                case StatusCodes.Status500InternalServerError:
+                    _logger.LogInformation(log);
+                    return StatusCode(500);
+                default:
+                    _logger.LogInformation(log);
+                    return BadRequest();
+            }
         }
     }
 }
