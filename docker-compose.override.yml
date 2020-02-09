@@ -13,4 +13,17 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-      - ./SQLite:/app/SQLite:ro
+    depends_on:
+      - db
+  db:
+    container_name: db
+    hostname: db
+    image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
+    environment:
+      SA_PASSWORD: "rH84VOH343"
+      MSSQL_PID: "Express"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433"
+    #volumes:
+     # - ./mssql:/var/opt/mssql:ro

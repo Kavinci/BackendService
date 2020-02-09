@@ -14,7 +14,9 @@ namespace BackendService.Migrations
                     RequestId = table.Column<Guid>(nullable: false),
                     Initiated = table.Column<DateTime>(nullable: false),
                     Completed = table.Column<DateTime>(nullable: false),
-                    Status = table.Column<int>(nullable: false)
+                    StatusCode = table.Column<int>(nullable: false),
+                    Status = table.Column<string>(nullable: true),
+                    Details = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

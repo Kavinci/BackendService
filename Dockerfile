@@ -3,7 +3,8 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
-RUN apk add bash sqlite 
+RUN apk add bash
+
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS build
 WORKDIR /src
@@ -19,5 +20,5 @@ RUN dotnet publish "BackendService.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN dotnet ef database-update
-ENTRYPOINT ["dotnet", "BackendService.dll"]
+RUN chmod +x ./entrypoint.sh
+CMD /bin/bash ./entrypoint.sh
