@@ -9,22 +9,22 @@ using BackendService.Contexts;
 
 namespace BackendService.Controllers
 {
-    [ApiController]
-    public class ApiController : ControllerBase
+    public class ApiController : BaseController
     {
-        private readonly ILogger<ApiController> _logger;
-
         /// <summary>
         /// Controller for the API endpoints with some logging
         /// </summary>
         /// <param name="logger"></param>
-        public ApiController(ILogger<ApiController> logger)
-        {
-            _logger = logger;
-        }
+        public ApiController(ApplicationContext context, ILogger<ApiController> logger) : base(context, logger) {      }
 
         [HttpGet]
-        public Request Status()
+        public string IsRunning()
+        {
+            return "App is running";
+        }
+
+        [HttpGet("{id}")]
+        public Request Status(string id)
         {
             return new Request();
         }

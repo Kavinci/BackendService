@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  backendservice:
+    image: ${DOCKER_REGISTRY-}backendservice
+    build:
+      context: .
+      dockerfile: Dockerfile

@@ -12,9 +12,8 @@ namespace BackendService.Contexts
     /// </summary>
     public class ApplicationContext : DbContext
     {
-        public ApplicationContext() { }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
-        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
+        public ApplicationContext () : base() { }
+        public ApplicationContext (DbContextOptions options) : base(options) { }
         public DbSet<Request> Requests { get; set; }
     }
 }
