@@ -12,6 +12,7 @@ namespace BackendService.Data
         public Guid RequestId { get; set; }
         public string Endpoint = "https://urldefense.proofpoint.com/v2/url?u=http-3A__example.com_request&d=DwIGAg&c=iWzD8gpC8N4xSkOHZBDmCw&r=R0U6eziUSfkIiSy6xlVVHEbyT-5CVX85B2177L6G3Po&m=yeOGbdLEit9cyYWgLXxv5PRcMgRiallgPowRbt59hFw&s=lZ8qcf2Nw6VP2qI311Xp3wnZgZDhuaIrUg7krpQgTr4&e=";
         public DateTime Initiated { get; set; }
+        public DateTime Updated { get; set; }
         public DateTime Completed { get; set; }
         public StatusType StatusCode { get; set; }
         public string Status { get 
@@ -53,6 +54,7 @@ namespace BackendService.Data
             }
         }
         public string Details { get; set; }
+        public string Body { get; set; }
     }
 
     /// <summary>
