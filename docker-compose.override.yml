@@ -21,7 +21,7 @@ services:
     hostname: db
     image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
     environment:
-      SA_PASSWORD: "rH84VOH343"
+      MSSQL_SA_PASSWORD: "rH84VOH343"
       MSSQL_PID: "Express"
       ACCEPT_EULA: "Y"
     ports:
