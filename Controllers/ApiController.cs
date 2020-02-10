@@ -69,7 +69,7 @@ namespace BackendService.Controllers
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPost("/api/callback/{id}")]
-        public ActionResult PostCallback(Guid id, [FromBody] string body)
+        public ActionResult PostCallback([FromRoute] Guid id, [FromBody] string body)
         {
             var request = _db.Requests.Find(id);
             if(request == null)
@@ -100,7 +100,7 @@ namespace BackendService.Controllers
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPut("/api/callback/{id}")]
-        public ActionResult PutCallback(Guid id, [FromBody] string body)
+        public ActionResult PutCallback([FromRoute] Guid id, [FromBody] string body)
         {
             var obj = JsonSerializer.Deserialize<JsonModel.PUT>(body);
             var request = _db.Requests.Find(id);
@@ -138,7 +138,7 @@ namespace BackendService.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("/api/status/{id}")]
-        public ActionResult Status(string id)
+        public ActionResult Status([FromRoute] string id)
         {
             var request = _db.Requests.Find(id);
 
