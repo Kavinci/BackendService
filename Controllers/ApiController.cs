@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BackendService.Data;
 using BackendService.Contexts;
 using BackendService.BusinessLogic;
+using System.Text.Json;
+using System.Net;
 
 namespace BackendService.Controllers
 {
@@ -31,14 +32,14 @@ namespace BackendService.Controllers
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPost("/api/request")]
-        public string Init([FromBody] string body)
+        public async Task<IActionResult> Init([FromBody] JsonModel.Request body)
         {
-            var obj = JsonSerializer.Deserialize<JsonModel.PUT>(body);
             var request = new Request()
             {
                 RequestId = Guid.NewGuid(),
                 Initiated = DateTime.Now,
-                StatusCode = StatusType.INITIALIZED
+                StatusCode = StatusType.INITIALIZED,
+                Body = body.body
             };
             try
             {
@@ -47,19 +48,17 @@ namespace BackendService.Controllers
             }
             catch
             {
-                var err = Respond(500, "An error occured during initialization", null);
-                return err.ToString();
+                return await Json(500, "An error occured during initialization");
             }
 
             var payload = new JsonModel.Endpoint
             {
-                body = body,
-                callback = "hostname/callback/" + request.RequestId.ToString()
+                body = body.body,
+                callback = "https://" + Dns.GetHostName() + ":5001/callback/" + request.RequestId.ToString()
             };
-            var json = JsonSerializer.Serialize(payload);
-            var response = Helpers.Send(json);
+            var response = Helpers.SendToService(request.Endpoint,"POST", payload);
             // check response for error codes
-            return request.RequestId.ToString();
+            return await Json(200, request.RequestId.ToString());
         }
 
         /// <summary>
@@ -69,12 +68,12 @@ namespace BackendService.Controllers
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPost("/api/callback/{id}")]
-        public ActionResult PostCallback([FromRoute] Guid id, [FromBody] string body)
+        public async Task<IActionResult> PostCallback([FromRoute] Guid id, [FromBody] string body)
         {
             var request = _db.Requests.Find(id);
             if(request == null)
             {
-                return Respond(404, "No record matching that Id", null);
+                return await Json(404, "No record matching that Id");
             }
 
             request.Status = body;
@@ -87,10 +86,10 @@ namespace BackendService.Controllers
             }
             catch
             {
-                return Respond(500, "Error updating record", null);
+                return await Json(500, "Error updating record");
             }
 
-            return Respond(204, null, null);
+            return await Json(204, null);
         }
 
         /// <summary>
@@ -100,14 +99,14 @@ namespace BackendService.Controllers
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPut("/api/callback/{id}")]
-        public ActionResult PutCallback([FromRoute] Guid id, [FromBody] string body)
+        public async Task<IActionResult> PutCallback([FromRoute] Guid id, [FromBody] string body)
         {
             var obj = JsonSerializer.Deserialize<JsonModel.PUT>(body);
             var request = _db.Requests.Find(id);
 
             if (request == null)
             {
-                return Respond(404, "No record matching that Id", null);
+                return await Json(404, "No record matching that Id");
             }
 
             request.Status = obj.status.ToString();
@@ -126,10 +125,10 @@ namespace BackendService.Controllers
             }
             catch
             {
-                return Respond(500, "Error updating record", null);
+                return await Json(500, "Error updating record");
             }
 
-            return Respond(204, null, null);
+            return await Json(204, null);
         }
 
         /// <summary>
@@ -138,13 +137,13 @@ namespace BackendService.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("/api/status/{id}")]
-        public ActionResult Status([FromRoute] string id)
+        public async Task<IActionResult> Status([FromRoute] string id)
         {
             var request = _db.Requests.Find(id);
 
             if(request == null)
             {
-                return Respond(404, "No record matching that Id", null);
+                return await Json(404, "No record matching that Id");
             }
 
             var res = new JsonModel.GET
@@ -156,7 +155,7 @@ namespace BackendService.Controllers
                 lastUpdated = request.Updated
             };
 
-            return Respond(200, null, JsonSerializer.Serialize(res));
+            return await Json(200, JsonSerializer.Serialize(res));
         }
     }
 }

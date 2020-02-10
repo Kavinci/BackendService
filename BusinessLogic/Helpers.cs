@@ -5,21 +5,22 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BackendService.BusinessLogic
 {
     public class Helpers
     {
-        public static string Send(string json)
+        public static string SendToService(string uri, string method, object json)
         {
-            HttpWebRequest webRequest = WebRequest.CreateHttp("https://urldefense.proofpoint.com/v2/url?u=http-3A__example.com_request&d=DwIGAg&c=iWzD8gpC8N4xSkOHZBDmCw&r=R0U6eziUSfkIiSy6xlVVHEbyT-5CVX85B2177L6G3Po&m=yeOGbdLEit9cyYWgLXxv5PRcMgRiallgPowRbt59hFw&s=lZ8qcf2Nw6VP2qI311Xp3wnZgZDhuaIrUg7krpQgTr4&e=");
+            HttpWebRequest webRequest = WebRequest.CreateHttp(uri);
             webRequest.ContentType = "application/json";
-            webRequest.Method = "POST";
+            webRequest.Method = method;
 
             using (var streamWriter = new StreamWriter(webRequest.GetRequestStream()))
             {
-                streamWriter.Write(json);
+                streamWriter.Write(JsonSerializer.Serialize(json));
             }
 
             var response = webRequest.GetResponse();

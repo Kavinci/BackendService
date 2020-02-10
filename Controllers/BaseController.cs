@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BackendService.Contexts;
 using BackendService.Data;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BackendService.Controllers
 {
@@ -25,26 +27,39 @@ namespace BackendService.Controllers
         {
             _db = context;
             _logger = logger;
+
         }
-        public ActionResult Respond(int status, string? message, object? obj)
+        public async Task<IActionResult> Json(int status, object json)
         {
-            var log = "StatusCode: " + status + "\nMessage: " + message + "\nResponseObj: " + obj.ToString();
+            var payload = JsonSerializer.Serialize(json);
+            var log = "StatusCode: " + status + "\nJson: " + payload;
+            LogResponse(log);
+            return await GetStatusResult(status, payload);
+        }
+        public async Task<IActionResult> Json(int status, object json, string message)
+        {
+            var payload = JsonSerializer.Serialize(json);
+            var log = "StatusCode: " + status + "\nMessage: " + message == null ? "" : message + "\nJSON: " + payload;
+            LogResponse(log);
+            return await GetStatusResult(status, payload);
+        }
+        public async Task<IActionResult> GetStatusResult(int status, string payload)
+        {
             switch (status)
             {
                 case StatusCodes.Status200OK:
-                    _logger.LogInformation(log);
-                    return Ok(message ?? obj);
+                    return Ok(payload);
                 case StatusCodes.Status204NoContent:
-                    _logger.LogInformation(log);
                     return NoContent();
                 case StatusCodes.Status500InternalServerError:
-                    _logger.LogInformation(log);
-                    return StatusCode(500);
+                    return StatusCode(500, payload);
                 default:
-                    _logger.LogInformation(log);
-                    return BadRequest();
+                    return BadRequest(payload);
             }
         }
-
+        public void LogResponse(string message)
+        {
+            _logger.LogInformation(message);
+        }
     }
 }
