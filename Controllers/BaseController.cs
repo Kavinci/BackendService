@@ -11,8 +11,6 @@ using Microsoft.Extensions.Logging;
 
 namespace BackendService.Controllers
 {
-    [Route("api/[action]")]
-    [ApiController]
     public class BaseController : ControllerBase
     {
         public ApplicationContext _db;
@@ -28,7 +26,6 @@ namespace BackendService.Controllers
             _db = context;
             _logger = logger;
         }
-
         public ActionResult Respond(int status, string? message, object? obj)
         {
             var log = "StatusCode: " + status + "\nMessage: " + message + "\nResponseObj: " + obj.ToString();
@@ -48,5 +45,6 @@ namespace BackendService.Controllers
                     return BadRequest();
             }
         }
+
     }
 }

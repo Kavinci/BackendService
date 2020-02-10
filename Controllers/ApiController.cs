@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using BackendService.Data;
 using BackendService.Contexts;
-using BackendService.Stub;
+using BackendService.BusinessLogic;
 
 namespace BackendService.Controllers
 {
@@ -19,14 +19,18 @@ namespace BackendService.Controllers
         /// </summary>
         /// <param name="logger"></param>
         public ApiController(ApplicationContext context, ILogger<ApiController> logger) : base(context, logger) { }
-
+        
+        [HttpGet("/api/isrunning")]
+        public string IsRunning()
+        {
+            return "App is running";
+        }
         /// <summary>
         /// hostname/request POST request endpoint initializes communication with service and creates a db record  
         /// </summary>
         /// <param name="body"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("request")]
+        [HttpPost("/api/request")]
         public string Init([FromBody] string body)
         {
             var obj = JsonSerializer.Deserialize<JsonModel.PUT>(body);
@@ -53,8 +57,8 @@ namespace BackendService.Controllers
                 callback = "hostname/callback/" + request.RequestId.ToString()
             };
             var json = JsonSerializer.Serialize(payload);
-            var response = Endpoint.Service(json);
-
+            var response = Helpers.Send(json);
+            // check response for error codes
             return request.RequestId.ToString();
         }
 
@@ -64,8 +68,7 @@ namespace BackendService.Controllers
         /// <param name="id"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("callback/{id}")]
+        [HttpPost("/api/callback/{id}")]
         public ActionResult PostCallback(Guid id, [FromBody] string body)
         {
             var request = _db.Requests.Find(id);
@@ -96,8 +99,7 @@ namespace BackendService.Controllers
         /// <param name="id"></param>
         /// <param name="body"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("callback/{id}")]
+        [HttpPut("/api/callback/{id}")]
         public ActionResult PutCallback(Guid id, [FromBody] string body)
         {
             var obj = JsonSerializer.Deserialize<JsonModel.PUT>(body);
@@ -135,8 +137,7 @@ namespace BackendService.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("status/{id}")]
+        [HttpGet("/api/status/{id}")]
         public ActionResult Status(string id)
         {
             var request = _db.Requests.Find(id);
