@@ -29,7 +29,7 @@ namespace BackendService
         {
             services.AddControllers();
             services.AddDbContext<ApplicationContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("Application")));
+                options.UseNpgsql(Configuration.GetConnectionString("Application")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

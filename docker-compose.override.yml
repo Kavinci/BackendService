@@ -19,14 +19,24 @@ services:
   db:
     container_name: db
     hostname: db
-    image: "mcr.microsoft.com/mssql/server:2019-CU1-ubuntu-16.04"
+    image: postgres:11
+    restart: always
     environment:
-      MSSQL_SA_PASSWORD: "rH84VOH343"
-      MSSQL_PID: "Express"
-      ACCEPT_EULA: "Y"
+      POSTGRES_PASSWORD: "rH84VOH343"
+      POSTGRES_USER: "app"
+      POSTGRES_DB: "application"
     ports:
-      - "1433:1433"
+      - "5432:5432"
     volumes:
-      - ./db/data:/var/opt/mssql/data
-      - ./db/log:/var/opt/mssql/log
-      - ./db/secrets:/var/opt/mssql/secrets
+      - pgdata:/var/lib/postgresql/data
+
+  adminer:
+    container_name: adminer
+    hostname: adminer
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes: 
+     pgdata:
