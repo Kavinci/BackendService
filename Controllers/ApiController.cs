@@ -10,6 +10,8 @@ using BackendService.Contexts;
 using BackendService.BusinessLogic;
 using System.Text.Json;
 using System.Net;
+using System.IO;
+using System.Text;
 
 namespace BackendService.Controllers
 {
@@ -38,6 +40,7 @@ namespace BackendService.Controllers
             {
                 RequestId = Guid.NewGuid(),
                 Initiated = DateTime.Now,
+                Updated = DateTime.Now,
                 StatusCode = StatusType.INITIALIZED,
                 Body = body.body
             };
@@ -56,8 +59,14 @@ namespace BackendService.Controllers
                 body = body.body,
                 callback = "https://" + Dns.GetHostName() + ":5001/callback/" + request.RequestId.ToString()
             };
-            var response = Helpers.SendToService(request.Endpoint,"POST", payload);
-            // check response for error codes
+            try
+            {
+                Helpers.SendToService(request.Endpoint, "POST", payload);
+            }
+            catch
+            {
+                // catch error codes from remote server
+            }
             return await Json(200, request.RequestId.ToString());
         }
 
@@ -68,15 +77,18 @@ namespace BackendService.Controllers
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPost("/api/callback/{id}")]
-        public async Task<IActionResult> PostCallback([FromRoute] Guid id, [FromBody] string body)
+        public async Task<IActionResult> PostCallback(Guid id)
         {
+            StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8);
+            var body = reader.ReadToEndAsync().Result;
+
             var request = _db.Requests.Find(id);
             if(request == null)
             {
                 return await Json(404, "No record matching that Id");
             }
 
-            request.Status = body;
+            request.Status = body; // Should strip/check for special characters like quotes and delimeters
             request.Updated = DateTime.Now;
 
             try
@@ -99,9 +111,8 @@ namespace BackendService.Controllers
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPut("/api/callback/{id}")]
-        public async Task<IActionResult> PutCallback([FromRoute] Guid id, [FromBody] string body)
+        public async Task<IActionResult> PutCallback(Guid id, [FromBody] JsonModel.PUT body)
         {
-            var obj = JsonSerializer.Deserialize<JsonModel.PUT>(body);
             var request = _db.Requests.Find(id);
 
             if (request == null)
@@ -109,8 +120,8 @@ namespace BackendService.Controllers
                 return await Json(404, "No record matching that Id");
             }
 
-            request.Status = obj.status.ToString();
-            request.Details = obj.detail.ToString();
+            request.Status = body.status;
+            request.Details = body.detail;
             request.Updated = DateTime.Now;
 
             if(request.StatusCode == StatusType.COMPLETED)
@@ -137,7 +148,7 @@ namespace BackendService.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("/api/status/{id}")]
-        public async Task<IActionResult> Status([FromRoute] string id)
+        public async Task<IActionResult> Status(Guid id)
         {
             var request = _db.Requests.Find(id);
 
@@ -155,7 +166,7 @@ namespace BackendService.Controllers
                 lastUpdated = request.Updated
             };
 
-            return await Json(200, JsonSerializer.Serialize(res));
+            return await Json(200, res);
         }
     }
 }

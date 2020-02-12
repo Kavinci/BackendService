@@ -27,6 +27,7 @@ namespace BackendService.Controllers
         {
             _db = context;
             _logger = logger;
+            ApplyMigrations(_db);
 
         }
         public async Task<IActionResult> Json(int status, object json)
@@ -60,6 +61,17 @@ namespace BackendService.Controllers
         public void LogResponse(string message)
         {
             _logger.LogInformation(message);
+        }
+        public void ApplyMigrations(ApplicationContext context)
+        {
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                context.Database.Migrate();
+                if (context.Database.EnsureCreated())
+                {
+                    throw new Exception("Unable to apply migration");
+                }
+            }
         }
     }
 }
